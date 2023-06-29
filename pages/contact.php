@@ -9,27 +9,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'civility' => FILTER_SANITIZE_STRING,
         'firstName' => FILTER_SANITIZE_STRING,
         'lastName' => FILTER_SANITIZE_STRING,
-        'email' => FILTER_VALIDATE_EMAIL,
+        'email' => FILTER_SANITIZE_EMAIL,
         'reason' => FILTER_SANITIZE_STRING,
         'message' => FILTER_SANITIZE_STRING,
     ];
 
     $formData = filter_input_array(INPUT_POST, $filters);
 
-    if (!$formData['civility']) {
-        $formErrors['civility'] = "Civilité invalide.";
+    if (!in_array($formData['civility'], ['M.', 'Mme'])) {
+        $formErrors['civility'] = 'Merci de choisir une civilité valide.';
     }
-    if (!$formData['firstName']) {
-        $formErrors['firstName'] = "Prénom invalide.";
+    if (empty($formData['firstname'])) {
+        $formErrors['firstname'] = 'Le champ prénom ne peut pas être vide.';
     }
-    if (!$formData['lastName']) {
-        $formErrors['lastName'] = "Nom invalide.";
+    if (empty($formData['lastname'])) {
+        $formErrors['lastname'] = 'Le champ nom ne peut pas être vide.';
     }
-    if (!$formData['email']) {
-        $formErrors['email'] = "Email invalide.";
+    if (!filter_var($formData['email'], FILTER_VALIDATE_EMAIL)) {
+        $formErrors['email'] = 'Merci de saisir un email valide.';
     }
-    if (!$formData['reason']) {
-        $formErrors['reason'] = "Raison de contact invalide.";
+    if (!in_array($formData['reason'], ['emploi', 'info', 'prestation'])) {
+        $formErrors['reason'] = 'Merci de choisir une raison de contact valide.';
     }
     if (!$formData['message'] || strlen($formData['message']) < 5) {
         $formErrors['message'] = "Message invalide. Il doit contenir au moins 5 lettres.";
@@ -50,6 +50,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <option value="M">M.</option>
             <option value="Mme">Mme</option>
         </select>
+<!--a répéter pour chaque champs        -->
+        <div class="form-error">
+            <?= $formErrors['civility'] ?? ''; ?>
+        </div>
+<!--a répéter pour chaque champs        -->
         <input type="text" name="firstName" placeholder="Prénom">
         <input type="text" name="lastName" placeholder="Nom">
         <input type="email" name="email" placeholder="Email">
@@ -61,6 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <textarea name="message"></textarea>
         <button type="submit">Envoyer</button>
     </form>
+<!--    Noté la syntaxe alternative de php utilisé dans les tempaltes cf @https://www.php.net/manual/fr/control-structures.alternative-syntax.php-->
     <?php if (!empty($formErrors)): ?>
         <ul>
             <?php foreach ($formErrors as $field => $error): ?>
