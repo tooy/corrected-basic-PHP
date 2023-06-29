@@ -9,7 +9,10 @@ $routes = [
 ];
 
 $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
-
+// si aucune page n'est définie dans $_GET, alors on utilise 'home' comme page par défaut
+if (empty($page)) {
+    $page = 'home';
+}
 ob_start(); // commence la mise en tampon de sortie
 
 if (!array_key_exists($page, $routes)) {
