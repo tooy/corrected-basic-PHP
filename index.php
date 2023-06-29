@@ -1,12 +1,22 @@
 <?php
+session_start();
 
-$page = $_GET['page'] ?? '404';
+$routes = [
+    'home' => 'home.php',
+    'contact' => 'contact.php',
+    'about' => 'about.php',
+    // ajoutez d'autres routes ici
+];
 
-if ($page == 'page1') {
-    include('pages/page1.phtml');
-} elseif ($page == 'page2') {
-    include('pages/page2.phtml');
-} else if ($page == '404') {
-    include "page/404.phtml";
+$page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
+
+if (!array_key_exists($page, $routes)) {
+    // Si la page demandée n'existe pas dans $routes, renvoyer une erreur 404
+    header("HTTP/1.0 404 Not Found");
+    include('404.php'); // supposons que vous avez un fichier 404.php pour gérer les erreurs 404
+} else {
+    // Si la page demandée existe dans $routes, inclure le fichier PHP correspondant
+    include($routes[$page]);
 }
+
 
